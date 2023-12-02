@@ -1,0 +1,14 @@
+{
+  "name": "adventofcode",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "repository": "git@github.com:kari0003/adventofcode.git",
+  "author": "Karoly Szekely <kari1038@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "bun --watch index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.1"
+  }
+}
