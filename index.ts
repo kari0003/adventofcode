@@ -1,4 +1,4 @@
-import { runner } from "./2023/2";
+import { runner } from "./2023/3";
 import { writeFileSync } from "fs";
 
 runner.run();
