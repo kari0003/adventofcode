@@ -8,23 +8,25 @@ execute () {
   sudo purge
   (
     trap time EXIT
+    cd $1
     hyperfine \
       --warmup 5 \
       --min-runs 10 \
       --max-runs 300 \
       --command-name $1 \
+      --setup 'make clean prepare' \
       --prepare 'sync;' \
-      'bun index.ts'
+      'make execute'
   )
   echo " "
 }
 
-execute bun
+cd 2023
 
-# if test -z $1; then
-#   for dir in day_*; do
-#    execute $dir
-#   done
-# else
-#   execute $1
-# fi
+if test -z $1; then
+  for dir in day_*; do
+   execute $dir
+  done
+else
+  execute $1
+fi
