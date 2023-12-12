@@ -6,7 +6,8 @@
   "author": "Karoly Szekely <kari1038@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "watch": "bun --watch index.ts"
+    "watch": "bun --watch index.ts",
+    "run": "bun index.ts"
   },
   "devDependencies": {
     "@types/node": "^20.10.1"

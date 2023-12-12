@@ -1,4 +1,4 @@
-import { AdventRunner } from "../adventRunner";
+import { AdventRunner } from "../day_11/adventRunner";
 
 type MapRange = { from: number; diff: number; len: number };
 type Map = {
@@ -177,4 +177,4 @@ class AdventRunner5 extends AdventRunner {
   }
 }
 
-export const runner = new AdventRunner5("./2023/seed/5.txt");
+export const runner = new AdventRunner5("./seed/5.txt");

@@ -1,4 +1,4 @@
-import { AdventRunner } from "../adventRunner";
+import { AdventRunner } from "./adventRunner";
 
 type Card = {
   id: number;
@@ -46,4 +46,4 @@ class AdventRunner4 extends AdventRunner {
   }
 }
 
-export const runner = new AdventRunner4("./2023/seed/4.txt");
+export const runner = new AdventRunner4("./seed/4.txt");

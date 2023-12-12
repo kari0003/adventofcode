@@ -1,4 +1,4 @@
-import { AdventRunner } from "../adventRunner";
+import { AdventRunner } from "./adventRunner";
 
 type Hand = { r: number; g: number; b: number };
 
@@ -60,4 +60,4 @@ class AdventRunner2 extends AdventRunner {
   }
 }
 
-export const runner = new AdventRunner2("./2023/seed/2.txt");
+export const runner = new AdventRunner2("./seed/2.txt");

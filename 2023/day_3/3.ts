@@ -1,4 +1,4 @@
-import { AdventRunner } from "../adventRunner";
+import { AdventRunner } from "./adventRunner";
 
 const part = /[\d]+/gim;
 const symbol = /[^.\d]/;
@@ -102,4 +102,4 @@ class AdventRunner3 extends AdventRunner {
   }
 }
 
-export const runner = new AdventRunner3("./2023/seed/3.txt", false);
+export const runner = new AdventRunner3("./seed/3.txt", false);

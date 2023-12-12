@@ -1,4 +1,4 @@
-import { AdventRunner } from "../adventRunner";
+import { AdventRunner } from "./adventRunner";
 
 const numberValues = {
   0: 0,
@@ -53,4 +53,4 @@ class AdventRunner1 extends AdventRunner {
   }
 }
 
-export const runner = new AdventRunner1("./2023/seed/1.txt");
+export const runner = new AdventRunner1("./seed/1.txt");
