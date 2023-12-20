@@ -7,6 +7,9 @@ const tokenPart = /#/;
 const startingToken = /^#[\?#]*[\?.]/g;
 const startingDots = /^\.+/g;
 
+const isMemo: Record<string, boolean> = {};
+const canMemo: Record<string, boolean> = {};
+
 const nextTokens = new Array(20).fill("").map((_, i) => {
   return new RegExp(`^\\\.*#[\?#]{${i}}[?.]`, "g");
 });
@@ -33,6 +36,10 @@ const unfolded = parsed.map((row) => ({
 }));
 
 const canCombinationBeValid = (row: string, lengths: number[]) => {
+  const key = row + lengths.join(",");
+  if (canMemo[key] !== undefined) {
+    return canMemo[key];
+  }
   let lengthIndex = 0;
   let springBuf = 0;
   for (let i = 0; i < row.length; i++) {
@@ -40,6 +47,7 @@ const canCombinationBeValid = (row: string, lengths: number[]) => {
       springBuf += 1;
       if (springBuf > lengths[lengthIndex]) {
         // .##.# 1,1
+        canMemo[key] = false;
         return false;
       }
     }
@@ -47,6 +55,7 @@ const canCombinationBeValid = (row: string, lengths: number[]) => {
       if (springBuf > 0) {
         if (springBuf < lengths[lengthIndex]) {
           // .##.# 3,1
+          canMemo[key] = false;
           return false;
         } else {
           lengthIndex += 1;
@@ -60,81 +69,83 @@ const canCombinationBeValid = (row: string, lengths: number[]) => {
   }
   const sum = lengths.reduce((sum, val) => sum + val, 0);
   const possibilities = row.length - row.split(".").length + 1; // number of # and ? equals length - number of .
+  canMemo[key] = sum <= possibilities;
   return sum <= possibilities;
 };
 
 const isCombinationValid = (row: string, lengths: number[]) => {
+  const key = row + lengths.join(",");
+  if (isMemo[key] !== undefined) {
+    return isMemo[key];
+  }
   const broken = row
     .split(".")
     .map((a) => a.length)
     .filter((a) => a != 0);
-  return (
+  const valid =
     lengths.length === broken.length &&
     broken.reduce(
       (valid, current, id) => valid && current === lengths[id],
       true
-    )
-  );
+    );
+  isMemo[key] = valid;
+  return isMemo[key];
 };
 
 function fillNextQuestionMark(row: string, isBroken: boolean) {
   return row.replace("?", isBroken ? "#" : ".");
 }
 
-function countCombinations(row: string, lengths: number[], count: number) {
+const combinationMemos: Record<string, number> = {};
+
+function memReturn(key: string, count: number): number {
+  combinationMemos[key] = count;
+  return count;
+}
+
+function countCombinations(row: string, lengths: number[]) {
+  const key = row + lengths.join(",");
+  if (combinationMemos[key] != undefined) {
+    return combinationMemos[key];
+  }
   if (optimize && lengths.length === 0) {
-    return row.match(tokenPart) ? count : count + 1;
+    return memReturn(key, row.match(tokenPart) ? 0 : 1);
   }
-  if (!canCombinationBeValid(row, lengths)) return count;
-
-  if (optimize) {
-    let rowS = row;
-    let len = [...lengths];
-    const toknenLength = len[0] - 1;
-    const tokenRegex = nextTokens[toknenLength];
-    const nextToken = row.match(tokenRegex);
-    if (nextToken) {
-      rowS = row.substring(nextToken[0].length);
-      len.shift();
-    }
-
-    if (!rowS.match(wildcard)) {
-      return isCombinationValid(rowS, len) ? count + 1 : count;
-    }
-
-    const emptyCount = countCombinations(
-      fillNextQuestionMark(rowS, false),
-      len,
-      count
-    );
-
-    return countCombinations(fillNextQuestionMark(rowS, true), len, emptyCount);
-  } else {
-    if (!row.match(wildcard)) {
-      return isCombinationValid(row, lengths) ? count + 1 : count;
-    }
-
-    const emptyCount = countCombinations(
-      fillNextQuestionMark(row, false),
-      lengths,
-      count
-    );
-    return countCombinations(
-      fillNextQuestionMark(row, true),
-      lengths,
-      emptyCount
-    );
+  if (!canCombinationBeValid(row, lengths)) {
+    return memReturn(key, 0);
   }
+
+  let rowS = row;
+  let len = [...lengths];
+  const toknenLength = len[0] - 1;
+  const tokenRegex = nextTokens[toknenLength];
+  const nextToken = row.match(tokenRegex);
+  if (nextToken) {
+    rowS = row.substring(nextToken[0].length);
+    len.shift();
+  }
+
+  if (!rowS.match(wildcard)) {
+    return memReturn(key, isCombinationValid(rowS, len) ? 1 : 0);
+  }
+
+  return memReturn(
+    key,
+    countCombinations(fillNextQuestionMark(rowS, false), len) +
+      countCombinations(fillNextQuestionMark(rowS, true), len)
+  );
 }
 
 const combinationsV1 = parsed
-  .map((p) => countCombinations(p.register, p.lengths, 0))
+  .map((p) => {
+    const count = countCombinations(p.register, p.lengths);
+    return count;
+  })
   .reduce((sum, val) => sum + val, 0);
 
 const combinationsV2 = unfolded
   .map((p) => {
-    const count = countCombinations(p.register, p.lengths, 0);
-    console.log("counting row", p.register, count);
+    const count = countCombinations(p.register, p.lengths);
     return count;
   })
   .reduce((sum, val) => sum + val, 0);
